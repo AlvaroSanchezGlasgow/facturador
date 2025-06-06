@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS customers (
     country VARCHAR(255) NULL,
     postal_code VARCHAR(50) NULL,
     province VARCHAR(50) NULL,
-    nif VARCHAR(255) UNIQUE,
+    nif VARCHAR(255) NOT NULL UNIQUE,
     version BIGINT NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL

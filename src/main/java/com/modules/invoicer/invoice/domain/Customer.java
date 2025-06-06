@@ -5,6 +5,7 @@ import com.modules.invoicer.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,8 @@ public class Customer extends BaseEntity {
     private String nif;
 
     @Email(message = "El formato del email no es válido")
+    @NotBlank(message = "El email del cliente es obligatorio")
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(name = "phone")
