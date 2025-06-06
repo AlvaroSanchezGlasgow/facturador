@@ -41,7 +41,7 @@ public class UserController {
             return "register";
         }
         try {
-            userService.registerNewUser(user);
+            userService.registerNewUserAsync(user).join();
             return "redirect:/login?registered";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -58,13 +58,14 @@ public class UserController {
     public String showDashboard(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User currentUser = userService.findByUsername(username)
+        User currentUser = userService.findByUsernameAsync(username)
+                .join()
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        model.addAttribute("pendingInvoicesCount", invoiceService.countPendingInvoices(currentUser));
-        model.addAttribute("paidInvoicesCount", invoiceService.countPaidInvoices(currentUser));
-        model.addAttribute("totalCustomersCount", invoiceService.countCustomers(currentUser));
-        model.addAttribute("invoices", invoiceService.findLatestInvoices(currentUser));
+        model.addAttribute("pendingInvoicesCount", invoiceService.countPendingInvoicesAsync(currentUser).join());
+        model.addAttribute("paidInvoicesCount", invoiceService.countPaidInvoicesAsync(currentUser).join());
+        model.addAttribute("totalCustomersCount", invoiceService.countCustomersAsync(currentUser).join());
+        model.addAttribute("invoices", invoiceService.findLatestInvoicesAsync(currentUser).join());
 
         return "dashboard";
     }
