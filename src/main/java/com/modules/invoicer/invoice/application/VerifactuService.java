@@ -1,7 +1,10 @@
 package com.modules.invoicer.invoice.application;
 
 import com.modules.invoicer.invoice.domain.Invoice;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class VerifactuService {
@@ -19,5 +22,10 @@ public class VerifactuService {
         invoice.setVerifactuSent(true);
         invoice.setVerifactuResponse("Simulated success");
         return true;
+    }
+
+    @Async
+    public CompletableFuture<Boolean> sendInvoiceToVerifactuAsync(Invoice invoice) {
+        return CompletableFuture.completedFuture(sendInvoiceToVerifactu(invoice));
     }
 }

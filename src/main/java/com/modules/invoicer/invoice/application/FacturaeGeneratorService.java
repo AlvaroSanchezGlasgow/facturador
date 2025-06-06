@@ -1,6 +1,9 @@
 package com.modules.invoicer.invoice.application;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
 // Importa las clases generadas a partir del XSD de Facturae o las que uses para construir el XML
 // import es.facturae.facturae321.Facturae;
 
@@ -24,5 +27,10 @@ public class FacturaeGeneratorService {
         // return sw.toString();
 
         return "<Facturae>Contenido XML de la factura</Facturae>"; // Placeholder
+    }
+
+    @Async
+    public CompletableFuture<String> generateFacturaeXmlAsync(Object invoiceData) {
+        return CompletableFuture.completedFuture(generateFacturaeXml(invoiceData));
     }
 }
