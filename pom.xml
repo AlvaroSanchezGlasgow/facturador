@@ -87,6 +87,26 @@
 			<artifactId>spring-modulith-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
+		<!-- Dependencias para firma digital (ej. Apache Santuario) -->
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -112,6 +132,29 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>3.1.0</version> <!-- Usa la versión más reciente -->
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- La ruta al directorio que contiene tus archivos XSD -->
+					<sources>
+						<source>src/main/resources/xsd/facturae</source>
+					</sources>
+					<!-- El paquete donde se generarán las clases -->
+					<outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+					<clearOutputDir>false</clearOutputDir>
+					<packageName>com.modules.invoicer.invoice.facturae.model</packageName>
 				</configuration>
 			</plugin>
 			<plugin>

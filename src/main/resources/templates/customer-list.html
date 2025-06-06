@@ -11,24 +11,22 @@
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>ID</th>
       <th>Nombre</th>
       <th>Apellido</th>
+      <th>Compañia</th>
       <th>Email</th>
       <th>Teléfono</th>
       <th>NIF</th>
-      <th>Dirección</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="customer : ${customers}">
-      <td th:text="${customer.id}"></td>
-      <td th:text="${customer.firstName}"></td>
-      <td th:text="${customer.lastName}"></td>
+      <td th:text="${customer.name}"></td>
+      <td th:text="${customer.surname}"></td>
+      <td th:text="${customer.company_name}"></td>
       <td th:text="${customer.email}"></td>
       <td th:text="${customer.phone}"></td>
       <td th:text="${customer.nif}"></td>
-      <td th:text="${customer.address}"></td>
     </tr>
     </tbody>
   </table>

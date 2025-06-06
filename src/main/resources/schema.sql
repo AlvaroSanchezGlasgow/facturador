@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS customers (
     user_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     surname VARCHAR(255) NULL,
+    company_name VARCHAR(255) NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(255),
     address VARCHAR(255),
@@ -41,9 +42,8 @@ CREATE TABLE IF NOT EXISTS customers (
     country VARCHAR(255) NULL,
     postal_code VARCHAR(50) NULL,
     province VARCHAR(50) NULL,
-    tax_id BIGINT NULL,
-    version BIGINT NULL,
     nif VARCHAR(255) UNIQUE,
+    version BIGINT NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );

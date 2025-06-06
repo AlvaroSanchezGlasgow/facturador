@@ -24,6 +24,11 @@ public class UserController {
         this.invoiceService = invoiceService;
     }
 
+    @GetMapping("/")
+    public String showRedirection() {
+        return "redirect:/dashboard";
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());

@@ -20,5 +20,8 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-    // Implementa aquí los otros métodos definidos en la interfaz
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
 }

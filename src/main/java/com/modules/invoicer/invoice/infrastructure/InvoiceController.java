@@ -51,15 +51,11 @@ public class InvoiceController {
             model.addAttribute("customers", invoiceService.findCustomersByUser(currentUser));
             return "invoice-form";
         }
-        try {
+
             invoiceService.createInvoice(invoice, currentUser);
             redirectAttributes.addFlashAttribute("successMessage", "Factura creada exitosamente!");
             return "redirect:/invoices";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Error al crear la factura: " + e.getMessage());
-            model.addAttribute("customers", invoiceService.findCustomersByUser(currentUser));
-            return "invoice-form";
-        }
+
     }
 
     @GetMapping("/{id}/edit")

@@ -53,6 +53,7 @@ public class Invoice extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Column(name = "status")
     private InvoiceStatus status = InvoiceStatus.DRAFT;
 
     @Column(name = "verifactu_sent")
@@ -62,6 +63,7 @@ public class Invoice extends BaseEntity {
     @Column(name = "verifactu_response")
     private String verifactuResponse;
 
+    @Column(name = "notes")
     private String notes;
 
     public void addItem(InvoiceItem item) {

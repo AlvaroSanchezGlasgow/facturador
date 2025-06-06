@@ -4,5 +4,9 @@ VALUES (1, 'admin', '$2a$12$3dxvHvImrI82YowezCgZ2OA2ISvFZicIU3z4rtmrBgvuxJG241p4
 INSERT INTO users (id, username, password, email, first_name, last_name, company_name, tax_id, account_non_expired, account_non_locked, credentials_non_expired, enabled, version)
 VALUES (2, 'user', '$2a$12$Wb404pxIXcFOGCKzNW05I.YcR7elDbh6x4OLFxzdZvcSq9JJDbzqG', 'user@example.com', 'Luis', 'Rodriguez', 'Netquest',1, true, true, true, true, 1);
 
-INSERT INTO customers (id, user_id, name, email, phone) VALUES (1,1, 'Cliente Ejemplo', 'cliente@example.com', '123-456-7890');
+INSERT INTO users (id, username, password, email, first_name, last_name, company_name, tax_id, account_non_expired, account_non_locked, credentials_non_expired, enabled, version)
+VALUES (3, 'alvaro', '$2a$12$Wb404pxIXcFOGCKzNW05I.YcR7elDbh6x4OLFxzdZvcSq9JJDbzqG', 'alvaro@example.com', 'Alvaro', 'Rodriguez', 'Netquest',1, true, true, true, true, 1);
+
+INSERT INTO customers (user_id, name, surname, company_name, email, phone, nif) VALUES (1, 'Cliente Ejemplo', 'Sanchez','Company, S.L.', 'cliente@example.com', '123-456-7890', '48769398M');
+INSERT INTO customers (user_id, name, surname, company_name, email, phone, nif) VALUES (1, 'Cliente Segundo', 'Garcia','Legacy, S.A.', 'cliente2@example.com', '123-456-7890', '5669398M');
 -- Añade más sentencias INSERT según tus necesidades
