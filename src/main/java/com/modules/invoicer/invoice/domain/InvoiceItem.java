@@ -42,13 +42,10 @@ public class InvoiceItem extends BaseEntity {
     private BigDecimal taxRate = new BigDecimal("21.00"); // IVA general en España
 
     public BigDecimal getSubtotal() {
-        BigDecimal returnValue;
-        if (quantity == null){
-            returnValue = BigDecimal.valueOf(0);
-        }else {
-            returnValue = quantity.multiply(unitPrice).setScale(2, RoundingMode.HALF_UP);
+        if (quantity == null || unitPrice == null) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         }
-        return returnValue;
+        return quantity.multiply(unitPrice).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getTaxAmount() {
