@@ -85,7 +85,7 @@ public class Invoice extends BaseEntity {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         taxAmount = items.stream()
-                .filter(item -> item.getTaxAmount() != null && item.getTaxAmount() != null)
+                .filter(item -> item.getQuantity() != null && item.getUnitPrice() != null)
                 .map(InvoiceItem::getTaxAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
