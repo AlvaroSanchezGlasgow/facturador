@@ -4,6 +4,8 @@ import com.modules.invoicer.invoice.domain.Customer;
 import com.modules.invoicer.invoice.application.CustomerService;
 import com.modules.invoicer.user.application.UserService;
 import com.modules.invoicer.user.domain.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final UserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
+
     @Autowired
     public CustomerController(CustomerService customerService, UserService userService) {
         this.customerService = customerService;
@@ -31,6 +35,7 @@ public class CustomerController {
 
     @GetMapping
     public String listCustomers(Model model) {
+        logger.info("Listing customers");
         List<Customer> customers = customerService.findAll();
         model.addAttribute("customers", customers);
         return "customer-list"; // Assuming you have a Thymeleaf template at src/main/resources/templates/customers/list.html
@@ -38,12 +43,14 @@ public class CustomerController {
 
     @GetMapping("/new")
     public String showNewCustomerForm(Model model) {
+        logger.info("Showing new customer form");
         model.addAttribute("customer", new Customer());
         return "customer-form";
     }
 
     @PostMapping("/save")
     public String saveCustomer(@ModelAttribute("customer") Customer customer) {
+        logger.info("Saving customer with NIF: {}", customer.getNif());
         User userNewCustomer = new User();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {

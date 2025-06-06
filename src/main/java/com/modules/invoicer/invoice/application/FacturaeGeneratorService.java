@@ -1,5 +1,7 @@
 package com.modules.invoicer.invoice.application;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +12,10 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class FacturaeGeneratorService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FacturaeGeneratorService.class);
+
     public String generateFacturaeXml(Object invoiceData) {
+        logger.info("Generating Facturae XML");
         // Aquí iría la lógica para transformar invoiceData (tus datos de factura)
         // en un objeto Facturae y luego serializarlo a XML.
         // Esto puede ser complejo y requerir el uso de JAXB o librerías específicas.
@@ -26,11 +31,14 @@ public class FacturaeGeneratorService {
         // marshaller.marshal(facturae, sw);
         // return sw.toString();
 
-        return "<Facturae>Contenido XML de la factura</Facturae>"; // Placeholder
+        String xml = "<Facturae>Contenido XML de la factura</Facturae>"; // Placeholder
+        logger.info("Facturae XML generated");
+        return xml;
     }
 
     @Async
     public CompletableFuture<String> generateFacturaeXmlAsync(Object invoiceData) {
+        logger.info("Asynchronously generating Facturae XML");
         return CompletableFuture.completedFuture(generateFacturaeXml(invoiceData));
     }
 }
