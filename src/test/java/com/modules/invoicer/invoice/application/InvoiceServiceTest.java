@@ -1,0 +1,58 @@
+package com.modules.invoicer.invoice.application;
+
+import com.modules.invoicer.invoice.domain.Customer;
+import com.modules.invoicer.invoice.domain.CustomerRepository;
+import com.modules.invoicer.invoice.domain.Invoice;
+import com.modules.invoicer.invoice.domain.InvoiceItem;
+import com.modules.invoicer.invoice.domain.InvoiceRepository;
+import com.modules.invoicer.user.domain.User;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class InvoiceServiceTest {
+
+    @Mock
+    private InvoiceRepository invoiceRepository;
+    @Mock
+    private CustomerRepository customerRepository;
+    @InjectMocks
+    private InvoiceService invoiceService;
+
+    @Test
+    void createInvoiceAssociatesUserAndSavesEntities() {
+        User user = new User();
+        Customer customer = new Customer();
+        Invoice invoice = Invoice.builder()
+                .customer(customer)
+                .items(new ArrayList<>())
+                .build();
+        invoice.addItem(InvoiceItem.builder()
+                .description("item")
+                .quantity(new BigDecimal("1"))
+                .unitPrice(new BigDecimal("10.00"))
+                .build());
+
+        when(customerRepository.save(any(Customer.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Invoice result = invoiceService.createInvoice(invoice, user);
+
+        assertThat(result.getUser()).isEqualTo(user);
+        assertThat(result.getCustomer().getUser()).isEqualTo(user);
+        assertThat(result.getSubtotal()).isEqualByComparingTo("10.00");
+        verify(customerRepository).save(customer);
+        verify(invoiceRepository).save(invoice);
+    }
+}
