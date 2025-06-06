@@ -27,7 +27,8 @@ public class Invoice extends BaseEntity {
     @Column(name = "invoice_date", nullable = false)
     private LocalDate invoiceDate;
 
-    @Column(name = "due_date")
+    @NotNull(message = "La fecha de vencimiento es obligatoria")
+    @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,18 +43,19 @@ public class Invoice extends BaseEntity {
     @Builder.Default
     private List<InvoiceItem> items = new ArrayList<>();
 
-    @Column(name = "subtotal", precision = 10, scale = 2)
+    @Column(name = "subtotal", precision = 10, scale = 2, nullable = false)
     private BigDecimal subtotal;
 
-    @Column(name = "tax_amount", precision = 10, scale = 2)
+    @Column(name = "tax_amount", precision = 10, scale = 2, nullable = false)
     private BigDecimal taxAmount;
 
-    @Column(name = "total_amount", precision = 10, scale = 2)
+    @Column(name = "total_amount", precision = 10, scale = 2, nullable = false)
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    @Column(name = "status")
+    @NotNull
+    @Column(name = "status", nullable = false)
     private InvoiceStatus status = InvoiceStatus.DRAFT;
 
     @Column(name = "verifactu_sent")
