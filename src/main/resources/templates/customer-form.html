@@ -7,41 +7,57 @@
     <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container my-4">
+<div class="container mt-5">
     <h2 class="mb-4">Crear Nuevo Cliente</h2>
 
     <form th:action="@{/customers/save}" th:object="${customer}" method="post">
-        <div class="mb-3">
-            <label for="name" class="form-label">Nombre:</label>
-            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+        <div class="field mb-4">
+            <label for="name" class="label">Nombre:</label>
+            <div class="control">
+                <input type="text" class="input" id="name" th:field="*{name}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="surname" class="form-label">Apellido:</label>
-            <input type="text" class="form-control" id="surname" th:field="*{surname}" required>
+        <div class="field mb-4">
+            <label for="surname" class="label">Apellido:</label>
+            <div class="control">
+                <input type="text" class="input" id="surname" th:field="*{surname}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="company_name" class="form-label">Compañía:</label>
-            <input type="text" class="form-control" id="company_name" th:field="*{company_name}" required>
+        <div class="field mb-4">
+            <label for="company_name" class="label">Compañía:</label>
+            <div class="control">
+                <input type="text" class="input" id="company_name" th:field="*{company_name}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
-            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+        <div class="field mb-4">
+            <label for="email" class="label">Email:</label>
+            <div class="control">
+                <input type="email" class="input" id="email" th:field="*{email}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="phone" class="form-label">Teléfono:</label>
-            <input type="text" class="form-control" id="phone" th:field="*{phone}">
+        <div class="field mb-4">
+            <label for="phone" class="label">Teléfono:</label>
+            <div class="control">
+                <input type="text" class="input" id="phone" th:field="*{phone}">
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="nif" class="form-label">NIF:</label>
-            <input type="text" class="form-control" id="nif" th:field="*{nif}">
+        <div class="field mb-4">
+            <label for="nif" class="label">NIF:</label>
+            <div class="control">
+                <input type="text" class="input" id="nif" th:field="*{nif}">
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="address" class="form-label">Dirección:</label>
-            <input type="text" class="form-control" id="address" th:field="*{address}">
+        <div class="field mb-4">
+            <label for="address" class="label">Dirección:</label>
+            <div class="control">
+                <input type="text" class="input" id="address" th:field="*{address}">
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar Cliente</button>
-        <a th:href="@{/customers}" class="btn btn-secondary ms-2">Cancelar</a>
+        <div class="buttons">
+            <button type="submit" class="button is-primary">Guardar Cliente</button>
+            <a th:href="@{/customers}" class="button is-light ml-2">Cancelar</a>
+        </div>
     </form>
 </div>
 
