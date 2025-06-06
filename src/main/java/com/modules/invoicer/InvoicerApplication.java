@@ -1,10 +1,10 @@
 package com.modules.invoicer;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.modulith.Modulith;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
+@Modulith(systemName = "Invoicer")
 @EnableJpaAuditing
 public class InvoicerApplication {
 
