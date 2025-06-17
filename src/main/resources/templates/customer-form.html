@@ -14,44 +14,51 @@
         <div class="field mb-4">
             <label for="name" class="label">Nombre:</label>
             <div class="control">
-                <input type="text" class="input" id="name" th:field="*{name}" required>
+                <input type="text" class="input" id="name" th:field="*{name}" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]+">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
         </div>
         <div class="field mb-4">
             <label for="surname" class="label">Apellido:</label>
             <div class="control">
-                <input type="text" class="input" id="surname" th:field="*{surname}" required>
+                <input type="text" class="input" id="surname" th:field="*{surname}" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]+">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></p>
         </div>
         <div class="field mb-4">
             <label for="company_name" class="label">Compañía:</label>
             <div class="control">
-                <input type="text" class="input" id="company_name" th:field="*{company_name}" required>
+                <input type="text" class="input" id="company_name" th:field="*{company_name}" required pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\\s]+">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('company_name')}" th:errors="*{company_name}"></p>
         </div>
         <div class="field mb-4">
             <label for="email" class="label">Email:</label>
             <div class="control">
                 <input type="email" class="input" id="email" th:field="*{email}" required>
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
         </div>
         <div class="field mb-4">
             <label for="phone" class="label">Teléfono:</label>
             <div class="control">
-                <input type="text" class="input" id="phone" th:field="*{phone}">
+                <input type="text" class="input" id="phone" th:field="*{phone}" pattern="[0-9+\\-\\s]{7,15}">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
         </div>
         <div class="field mb-4">
             <label for="nif" class="label">NIF:</label>
             <div class="control">
-                <input type="text" class="input" id="nif" th:field="*{nif}">
+                <input type="text" class="input" id="nif" th:field="*{nif}" required pattern="[0-9A-Za-z]+">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('nif')}" th:errors="*{nif}"></p>
         </div>
         <div class="field mb-4">
             <label for="address" class="label">Dirección:</label>
             <div class="control">
-                <input type="text" class="input" id="address" th:field="*{address}">
+                <input type="text" class="input" id="address" th:field="*{address}" pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\\s,.-]+">
             </div>
+            <p class="help is-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
         </div>
 
         <div class="buttons">
