@@ -126,6 +126,7 @@
             <th>Fecha Vencimiento</th>
             <th>Total</th>
             <th>Estado</th>
+            <th>Respuesta Verifactu</th>
             <th>Acciones</th>
           </tr>
           </thead>
@@ -139,9 +140,13 @@
             <td>
               <span th:classappend="${invoice.status == T(com.modules.invoicer.invoice.domain.InvoiceStatus).PAID ? 'tag is-success' : 'tag is-warning'}" th:text="${invoice.status.displayName}"></span>
             </td>
+            <td th:text="${invoice.verifactuResponse}"></td>
             <td>
               <a th:href="@{/invoices/{id}(id=${invoice.id})}" class="button is-small is-info">Ver</a>
               <a th:href="@{/invoices/edit/{id}(id=${invoice.id})}" class="button is-small is-primary">Editar</a>
+              <form th:action="@{/invoices/{id}/send-verifactu(id=${invoice.id})}" method="post" style="display:inline;" th:if="${!invoice.verifactuSent}">
+                <button type="submit" class="button is-small is-warning">Enviar a Verifactu</button>
+              </form>
               <form th:action="@{/invoices/delete/{id}(id=${invoice.id})}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta factura?');">
                 <button type="submit" class="button is-small is-danger">Eliminar</button>
               </form>

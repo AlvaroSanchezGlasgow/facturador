@@ -5,6 +5,7 @@ import com.modules.invoicer.invoice.domain.CustomerRepository;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
 import com.modules.invoicer.invoice.domain.InvoiceRepository;
+import com.modules.invoicer.invoice.application.VerifactuService;
 import com.modules.invoicer.user.domain.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,8 @@ class InvoiceServiceTest {
     private InvoiceRepository invoiceRepository;
     @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private VerifactuService verifactuService;
     @InjectMocks
     private InvoiceService invoiceService;
 
@@ -54,5 +57,22 @@ class InvoiceServiceTest {
         assertThat(result.getSubtotal()).isEqualByComparingTo("10.00");
         verify(customerRepository).save(customer);
         verify(invoiceRepository).save(invoice);
+    }
+
+    @Test
+    void sendInvoiceUpdatesStatusAndCallsService() {
+        User user = new User();
+        Invoice invoice = new Invoice();
+        invoice.setId(1L);
+
+        when(invoiceRepository.findByIdAndUser(1L, user)).thenReturn(java.util.Optional.of(invoice));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(verifactuService.sendInvoiceToVerifactu(invoice)).thenReturn(true);
+
+        Invoice result = invoiceService.sendInvoiceToVerifactu(1L, user);
+
+        assertThat(result.isVerifactuSent()).isTrue();
+        assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.SENT_VERIFACTU);
+        verify(verifactuService).sendInvoiceToVerifactu(invoice);
     }
 }
