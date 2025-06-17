@@ -17,7 +17,7 @@
     <div class="field mb-4">
       <label for="invoiceNumber" class="label">Número de Factura:</label>
       <div class="control">
-        <input type="text" id="invoiceNumber" th:field="*{invoiceNumber}" class="input" required>
+        <input type="text" id="invoiceNumber" th:field="*{invoiceNumber}" class="input" required pattern="[A-Za-z0-9-]+">
       </div>
       <p class="help is-danger" th:if="${#fields.hasErrors('invoiceNumber')}" th:errors="*{invoiceNumber}"></p>
     </div>
@@ -33,7 +33,7 @@
     <div class="field mb-4">
       <label for="dueDate" class="label">Fecha de Vencimiento:</label>
       <div class="control">
-        <input type="date" id="dueDate" th:field="*{dueDate}" class="input">
+        <input type="date" id="dueDate" th:field="*{dueDate}" class="input" required>
       </div>
       <p class="help is-danger" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
     </div>

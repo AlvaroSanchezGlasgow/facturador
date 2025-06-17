@@ -50,13 +50,13 @@
     <div class="field">
       <label for="username" class="label">Usuario:</label>
       <div class="control">
-        <input type="text" id="username" name="username" class="input" autofocus="autofocus" placeholder="Introduce tu usuario">
+        <input type="text" id="username" name="username" class="input" autofocus="autofocus" placeholder="Introduce tu usuario" required pattern="[A-Za-z0-9_]+">
       </div>
     </div>
     <div class="field">
       <label for="password" class="label">Contraseña:</label>
       <div class="control">
-        <input type="password" id="password" name="password" class="input" placeholder="Introduce tu contraseña">
+        <input type="password" id="password" name="password" class="input" placeholder="Introduce tu contraseña" required minlength="6">
       </div>
     </div>
     <button type="submit" class="button is-primary is-fullwidth">Entrar</button>

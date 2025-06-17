@@ -47,7 +47,7 @@
     <div class="field">
       <label for="username" class="label">Usuario:</label>
       <div class="control">
-        <input type="text" id="username" th:field="*{username}" class="input" required>
+        <input type="text" id="username" th:field="*{username}" class="input" required pattern="[A-Za-z0-9_]{3,}">
       </div>
       <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="help is-danger"></p>
     </div>
@@ -61,7 +61,7 @@
     <div class="field">
       <label for="password" class="label">Contraseña:</label>
       <div class="control">
-        <input type="password" id="password" th:field="*{password}" class="input" required>
+        <input type="password" id="password" th:field="*{password}" class="input" required minlength="6">
       </div>
       <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="help is-danger"></p>
     </div>
