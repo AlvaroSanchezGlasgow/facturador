@@ -109,6 +109,20 @@ public class InvoiceController {
         return "redirect:/invoices";
     }
 
+    @PostMapping("/{id}/send-verifactu")
+    public String sendInvoiceToVerifactu(@PathVariable Long id,
+                                         @AuthenticationPrincipal User currentUser,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            logger.info("Sending invoice {} to Verifactu", id);
+            invoiceService.sendInvoiceToVerifactu(id, currentUser);
+            redirectAttributes.addFlashAttribute("successMessage", "Factura enviada a Verifactu");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al enviar la factura: " + e.getMessage());
+        }
+        return "redirect:/invoices";
+    }
+
     @PostMapping("/addItem")
     public String addItemToInvoice(@ModelAttribute Invoice invoice) {
         logger.info("Adding item to invoice");

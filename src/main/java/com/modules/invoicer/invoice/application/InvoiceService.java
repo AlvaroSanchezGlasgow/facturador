@@ -2,6 +2,7 @@ package com.modules.invoicer.invoice.application;
 
 import com.modules.invoicer.invoice.domain.*;
 import com.modules.invoicer.user.domain.User;
+import com.modules.invoicer.invoice.application.VerifactuService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -18,12 +19,15 @@ public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final CustomerRepository customerRepository;
+    private final VerifactuService verifactuService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceService.class);
 
-    public InvoiceService(InvoiceRepository invoiceRepository, CustomerRepository customerRepository) {
+    public InvoiceService(InvoiceRepository invoiceRepository, CustomerRepository customerRepository,
+                          VerifactuService verifactuService) {
         this.invoiceRepository = invoiceRepository;
         this.customerRepository = customerRepository;
+        this.verifactuService = verifactuService;
     }
 
     @Transactional
@@ -205,5 +209,25 @@ public class InvoiceService {
     public CompletableFuture<List<Invoice>> findLatestInvoicesAsync(User user) {
         logger.info("Asynchronously fetching latest invoices for user {}", user.getUsername());
         return CompletableFuture.completedFuture(findLatestInvoices(user));
+    }
+
+    @Transactional
+    public Invoice sendInvoiceToVerifactu(Long id, User user) {
+        logger.info("Sending invoice {} to Verifactu for user {}", id, user.getUsername());
+        Invoice invoice = invoiceRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada o no pertenece al usuario."));
+
+        if (invoice.isVerifactuSent()) {
+            return invoice;
+        }
+
+        invoice.setStatus(InvoiceStatus.PENDING_VERIFACTU);
+        invoiceRepository.save(invoice);
+
+        boolean sent = verifactuService.sendInvoiceToVerifactu(invoice);
+        if (sent) {
+            invoice.setStatus(InvoiceStatus.SENT_VERIFACTU);
+        }
+        return invoiceRepository.save(invoice);
     }
 }
