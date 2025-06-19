@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.concurrent.CompletableFuture;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -40,6 +41,13 @@ public class InvoiceService {
 
         // Remove items without required information before persisting
         invoice.getItems().removeIf(InvoiceItem::isEmpty);
+
+        // Ensure all remaining items are linked to the invoice instance
+        if (!invoice.getItems().isEmpty()) {
+            List<InvoiceItem> items = new ArrayList<>(invoice.getItems());
+            invoice.getItems().clear();
+            items.forEach(invoice::addItem);
+        }
 
         invoice.calculateTotals();
         Invoice saved = invoiceRepository.save(invoice);
