@@ -60,6 +60,30 @@ class InvoiceServiceTest {
     }
 
     @Test
+    void createInvoiceIgnoresEmptyItems() {
+        User user = new User();
+        Customer customer = new Customer();
+        Invoice invoice = Invoice.builder()
+                .customer(customer)
+                .items(new ArrayList<>())
+                .build();
+        invoice.addItem(new InvoiceItem()); // empty item should be ignored
+        invoice.addItem(InvoiceItem.builder()
+                .description("item")
+                .quantity(new BigDecimal("2"))
+                .unitPrice(new BigDecimal("5.00"))
+                .build());
+
+        when(customerRepository.save(any(Customer.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Invoice result = invoiceService.createInvoice(invoice, user);
+
+        assertThat(result.getItems()).hasSize(1);
+        assertThat(result.getSubtotal()).isEqualByComparingTo("10.00");
+    }
+
+    @Test
     void sendInvoiceUpdatesStatusAndCallsService() {
         User user = new User();
         Invoice invoice = new Invoice();
