@@ -56,4 +56,15 @@ public class InvoiceItem extends BaseEntity {
     public BigDecimal getTotal() {
         return getSubtotal().add(getTaxAmount());
     }
+
+    /**
+     * Checks if the item doesn't contain the required information and should
+     * not be persisted. An item is considered empty when the description is
+     * blank and both quantity and unit price are {@code null}.
+     */
+    public boolean isEmpty() {
+        return (description == null || description.isBlank())
+                && quantity == null
+                && unitPrice == null;
+    }
 }

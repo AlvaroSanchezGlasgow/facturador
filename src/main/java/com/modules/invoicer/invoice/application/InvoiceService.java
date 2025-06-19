@@ -37,6 +37,10 @@ public class InvoiceService {
         invoice.getCustomer().setUser(user); // Asegura que el cliente también esté asociado al usuario
         Customer savedCustomer = customerRepository.save(invoice.getCustomer());
         invoice.setCustomer(savedCustomer);
+
+        // Remove items without required information before persisting
+        invoice.getItems().removeIf(InvoiceItem::isEmpty);
+
         invoice.calculateTotals();
         Invoice saved = invoiceRepository.save(invoice);
         logger.info("Invoice {} created", saved.getId());
@@ -84,9 +88,11 @@ public class InvoiceService {
                     updatedCustomer.setUser(user);
                     existingInvoice.setCustomer(customerRepository.save(updatedCustomer));
 
-                    // Actualizar items (lógica más compleja para añadir/eliminar/modificar items)
+                    // Actualizar items (lógica para añadir/eliminar/modificar items)
                     existingInvoice.getItems().clear();
-                    updatedInvoice.getItems().forEach(existingInvoice::addItem);
+                    updatedInvoice.getItems().stream()
+                            .filter(item -> !item.isEmpty())
+                            .forEach(existingInvoice::addItem);
 
                     existingInvoice.calculateTotals();
                     Invoice saved = invoiceRepository.save(existingInvoice);
