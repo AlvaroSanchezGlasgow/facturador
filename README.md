@@ -17,3 +17,6 @@ SPRING_PROFILES_ACTIVE=live ./mvnw spring-boot:run
 ```
 
 If no profile is specified, the application falls back to the `dev` profile.
+
+The database schema is automatically created on startup using Hibernate's
+`ddl-auto=update` setting.
