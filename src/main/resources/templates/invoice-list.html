@@ -134,7 +134,7 @@
           <tr th:each="invoice : ${invoices}">
             <td th:text="${invoice.invoiceNumber}"></td>
             <td th:text="${invoice.customer.name}"></td>
-            <td th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')}"></td>
+            <td th:text="${#temporals.format(invoice.invoiceDate, 'dd-MM-yyyy')}"></td>
             <td th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}"></td>
             <td th:text="${#numbers.formatDecimal(invoice.totalAmount, 0, 'POINT', 2, 'COMMA')} + ' €'"></td>
             <td>
