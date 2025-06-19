@@ -2,6 +2,8 @@
 
 This project is a Spring Boot application. It now supports multiple runtime environments through Spring profiles.
 
+The web interface has been refreshed with [Bulma](https://bulma.io/) styles for a modern look and feel.
+
 ## Running with profiles
 
 The application uses the `spring.profiles.active` property to select which configuration file to load. Three profiles are provided out of the box:
