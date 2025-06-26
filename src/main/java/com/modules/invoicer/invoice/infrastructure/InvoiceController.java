@@ -1,11 +1,8 @@
 package com.modules.invoicer.invoice.infrastructure;
 
 import com.modules.invoicer.invoice.application.InvoiceService;
-<<<<<<< codex/añadir-notas-internas-a-las-facturas
 import com.modules.invoicer.invoice.application.InvoiceNoteService;
-=======
 import com.modules.invoicer.invoice.application.InvoicePdfService;
->>>>>>> main
 import com.modules.invoicer.invoice.domain.Customer;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
@@ -34,23 +31,16 @@ import java.util.Optional;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
-<<<<<<< codex/añadir-notas-internas-a-las-facturas
     private final InvoiceNoteService invoiceNoteService;
-
-    private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
-
-    public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService) {
-        this.invoiceService = invoiceService;
-        this.invoiceNoteService = invoiceNoteService;
-=======
     private final InvoicePdfService pdfService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
 
-    public InvoiceController(InvoiceService invoiceService, InvoicePdfService pdfService) {
+    public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService, InvoicePdfService pdfService) {
         this.invoiceService = invoiceService;
+        this.invoiceNoteService = invoiceNoteService;
         this.pdfService = pdfService;
->>>>>>> main
+
     }
 
     @GetMapping
