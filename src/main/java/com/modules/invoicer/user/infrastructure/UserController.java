@@ -71,8 +71,7 @@ public class UserController {
                 .join()
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        model.addAttribute("pendingInvoicesCount", invoiceService.countPendingInvoicesAsync(currentUser).join());
-        model.addAttribute("paidInvoicesCount", invoiceService.countPaidInvoicesAsync(currentUser).join());
+        model.addAttribute("invoiceStatusCounts", invoiceService.countInvoicesByStatusAsync(currentUser).join());
         model.addAttribute("totalCustomersCount", invoiceService.countCustomersAsync(currentUser).join());
         model.addAttribute("invoices", invoiceService.findLatestInvoicesAsync(currentUser).join());
 
