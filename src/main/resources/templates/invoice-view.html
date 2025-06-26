@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle de Factura</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4">Detalle de Factura</h2>
+
+  <div class="box">
+    <p><strong>Número:</strong> <span th:text="${invoice.invoiceNumber}"></span></p>
+    <p><strong>Cliente:</strong> <span th:text="${invoice.customer.name}"></span></p>
+    <p><strong>Fecha:</strong> <span th:text="${#temporals.format(invoice.invoiceDate, 'dd-MM-yyyy')}"></span></p>
+    <p><strong>Vencimiento:</strong> <span th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}"></span></p>
+    <p><strong>Total:</strong> <span th:text="${#numbers.formatDecimal(invoice.totalAmount,0,'POINT',2,'COMMA')} + ' €'"></span></p>
+  </div>
+
+  <h3 class="title is-5">Notas internas</h3>
+  <div th:if="${notes.isEmpty()}" class="notification is-warning">
+    No hay notas registradas.
+  </div>
+  <div th:each="note : ${notes}" class="box">
+    <p class="is-size-7 has-text-grey" th:text="${#temporals.format(note.createdAt, 'dd-MM-yyyy HH:mm')} + ' - ' + note.author.username"></p>
+    <p th:text="${note.content}"></p>
+  </div>
+
+  <form th:action="@{/invoices/{id}/notes(id=${invoice.id})}" th:object="${newNote}" method="post">
+    <div class="field">
+      <div class="control">
+        <textarea class="textarea" th:field="*{content}" placeholder="Añadir nota..."></textarea>
+      </div>
+      <p class="help is-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></p>
+    </div>
+    <div class="field">
+      <button type="submit" class="button is-primary">Guardar Nota</button>
+      <a th:href="@{/invoices}" class="button is-light">Volver</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>
