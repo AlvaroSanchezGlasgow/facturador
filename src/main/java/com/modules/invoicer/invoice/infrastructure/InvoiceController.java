@@ -1,7 +1,11 @@
 package com.modules.invoicer.invoice.infrastructure;
 
 import com.modules.invoicer.invoice.application.InvoiceService;
+<<<<<<< codex/añadir-notas-internas-a-las-facturas
 import com.modules.invoicer.invoice.application.InvoiceNoteService;
+=======
+import com.modules.invoicer.invoice.application.InvoicePdfService;
+>>>>>>> main
 import com.modules.invoicer.invoice.domain.Customer;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
@@ -12,6 +16,10 @@ import org.slf4j.LoggerFactory;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +34,7 @@ import java.util.Optional;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+<<<<<<< codex/añadir-notas-internas-a-las-facturas
     private final InvoiceNoteService invoiceNoteService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
@@ -33,6 +42,15 @@ public class InvoiceController {
     public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService) {
         this.invoiceService = invoiceService;
         this.invoiceNoteService = invoiceNoteService;
+=======
+    private final InvoicePdfService pdfService;
+
+    private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
+
+    public InvoiceController(InvoiceService invoiceService, InvoicePdfService pdfService) {
+        this.invoiceService = invoiceService;
+        this.pdfService = pdfService;
+>>>>>>> main
     }
 
     @GetMapping
@@ -170,6 +188,22 @@ public class InvoiceController {
             invoice.getItems().remove(index);
         }
         return "invoice-form :: #invoiceItems"; // Fragmento para Thymeleaf
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable Long id,
+                                                     @AuthenticationPrincipal User currentUser) {
+        logger.info("Downloading PDF for invoice {}", id);
+        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, currentUser).join();
+        if (invoiceOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        byte[] pdf = pdfService.generateInvoicePdf(invoiceOptional.get());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        String filename = "factura-" + invoiceOptional.get().getInvoiceNumber() + ".pdf";
+        headers.setContentDispositionFormData(filename, filename);
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
 
     // Customer management (simplified for now, could be its own controller)

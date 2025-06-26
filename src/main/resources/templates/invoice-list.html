@@ -144,6 +144,7 @@
             <td>
               <a th:href="@{/invoices/{id}(id=${invoice.id})}" class="button is-small is-info">Ver</a>
               <a th:href="@{/invoices/edit/{id}(id=${invoice.id})}" class="button is-small is-primary">Editar</a>
+              <a th:href="@{/invoices/{id}/pdf(id=${invoice.id})}" class="button is-small is-link">PDF</a>
               <form th:action="@{/invoices/{id}/send-verifactu(id=${invoice.id})}" method="post" style="display:inline;" th:if="${!invoice.verifactuSent}">
                 <button type="submit" class="button is-small is-warning">Enviar a Verifactu</button>
               </form>
@@ -155,6 +156,7 @@
           </tbody>
         </table>
       </div>
+        <a th:href="@{/}" class="button is-light mt-4">Volver al Inicio</a>
     </main>
   </div>
 </div>
