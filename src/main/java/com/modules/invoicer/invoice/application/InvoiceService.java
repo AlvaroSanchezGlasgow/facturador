@@ -203,6 +203,21 @@ public class InvoiceService {
         return CompletableFuture.completedFuture(countPaidInvoices(user));
     }
 
+    public java.util.Map<InvoiceStatus, Long> countInvoicesByStatus(User user) {
+        logger.info("Counting invoices by status for user {}", user.getUsername());
+        java.util.Map<InvoiceStatus, Long> counts = new java.util.EnumMap<>(InvoiceStatus.class);
+        for (InvoiceStatus status : InvoiceStatus.values()) {
+            counts.put(status, invoiceRepository.countByUserAndStatus(user, status));
+        }
+        return counts;
+    }
+
+    @Async
+    public CompletableFuture<java.util.Map<InvoiceStatus, Long>> countInvoicesByStatusAsync(User user) {
+        logger.info("Asynchronously counting invoices by status for user {}", user.getUsername());
+        return CompletableFuture.completedFuture(countInvoicesByStatus(user));
+    }
+
     public long countCustomers(User user) {
         logger.info("Counting customers for user {}", user.getUsername());
         return customerRepository.countByUser(user);

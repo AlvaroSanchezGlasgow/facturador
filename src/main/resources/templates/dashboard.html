@@ -106,26 +106,19 @@
         <h1 class="title is-4">Dashboard</h1>
       </div>
 
-      <div class="columns">
-        <div class="column is-4">
-          <div class="card has-background-primary has-text-white mb-3">
+      <div class="columns is-multiline">
+        <div class="column is-4" th:each="status, count : ${invoiceStatusCounts}">
+          <div class="card mb-3"
+               th:classappend="${status} == T(com.modules.invoicer.invoice.domain.InvoiceStatus).PAID ? 'has-background-success has-text-white' :
+                                ${status} == T(com.modules.invoicer.invoice.domain.InvoiceStatus).PENDING ? 'has-background-primary has-text-white' :
+                                ${status} == T(com.modules.invoicer.invoice.domain.InvoiceStatus).SENT ? 'has-background-info has-text-white' :
+                                ${status} == T(com.modules.invoicer.invoice.domain.InvoiceStatus).CANCELLED ? 'has-background-danger has-text-white' :
+                                'has-background-warning has-text-black'">
             <header class="card-header">
-              <p class="card-header-title">Facturas Pendientes</p>
+              <p class="card-header-title">Facturas [[${status.displayName}]]</p>
             </header>
             <div class="card-content">
-              <p class="title">[[${pendingInvoicesCount}]]</p>
-              <p>Número de facturas con estado PENDIENTE.</p>
-            </div>
-          </div>
-        </div>
-        <div class="column is-4">
-          <div class="card has-background-success has-text-white mb-3">
-            <header class="card-header">
-              <p class="card-header-title">Facturas Pagadas</p>
-            </header>
-            <div class="card-content">
-              <p class="title">[[${paidInvoicesCount}]]</p>
-              <p>Número de facturas con estado PAGADA.</p>
+              <p class="title">[[${count}]]</p>
             </div>
           </div>
         </div>
