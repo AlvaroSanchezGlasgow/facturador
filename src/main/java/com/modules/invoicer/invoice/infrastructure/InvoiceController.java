@@ -1,9 +1,11 @@
 package com.modules.invoicer.invoice.infrastructure;
 
 import com.modules.invoicer.invoice.application.InvoiceService;
+import com.modules.invoicer.invoice.application.InvoiceNoteService;
 import com.modules.invoicer.invoice.domain.Customer;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
+import com.modules.invoicer.invoice.domain.InvoiceNote;
 import com.modules.invoicer.user.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +26,13 @@ import java.util.Optional;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+    private final InvoiceNoteService invoiceNoteService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
 
-    public InvoiceController(InvoiceService invoiceService) {
+    public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService) {
         this.invoiceService = invoiceService;
+        this.invoiceNoteService = invoiceNoteService;
     }
 
     @GetMapping
@@ -63,6 +67,35 @@ public class InvoiceController {
         redirectAttributes.addFlashAttribute("successMessage", "Factura creada exitosamente!");
         return "redirect:/invoices";
 
+    }
+
+    @GetMapping("/{id}")
+    public String viewInvoice(@PathVariable Long id, Model model, @AuthenticationPrincipal User currentUser) {
+        logger.info("Viewing invoice {}", id);
+        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, currentUser).join();
+        if (invoiceOptional.isEmpty()) {
+            return "redirect:/invoices";
+        }
+        Invoice invoice = invoiceOptional.get();
+        model.addAttribute("invoice", invoice);
+        model.addAttribute("notes", invoiceNoteService.findNotesByInvoice(invoice));
+        model.addAttribute("newNote", InvoiceNote.builder().build());
+        return "invoice-view";
+    }
+
+    @PostMapping("/{id}/notes")
+    public String addNote(@PathVariable Long id,
+                          @Valid @ModelAttribute("newNote") InvoiceNote newNote,
+                          BindingResult result,
+                          @AuthenticationPrincipal User currentUser,
+                          RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Contenido de nota inválido");
+            return "redirect:/invoices/" + id;
+        }
+        invoiceNoteService.addNote(id, newNote.getContent(), currentUser);
+        redirectAttributes.addFlashAttribute("successMessage", "Nota añadida correctamente");
+        return "redirect:/invoices/" + id;
     }
 
     @GetMapping("/{id}/edit")
