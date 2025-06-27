@@ -12,3 +12,7 @@ VALUES (1, 3, 'Cliente Ejemplo', 'Sanchez','Company, S.L.', 'cliente@example.com
 INSERT INTO customers (id, user_id, name, surname, company_name, email, phone, nif, version, created_at, updated_at)
 VALUES (2, 3, 'Cliente Segundo', 'Garcia','Legacy, S.A.', 'cliente2@example.com', '123-456-7890', '5669398M', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 -- Añade más sentencias INSERT según tus necesidades
+
+-- Reset auto increment counters to avoid duplicate key errors
+ALTER TABLE customers ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE users ALTER COLUMN id RESTART WITH 4;
