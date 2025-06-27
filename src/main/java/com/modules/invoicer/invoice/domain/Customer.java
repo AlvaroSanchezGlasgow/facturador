@@ -19,9 +19,6 @@ import java.time.LocalDateTime;
 @Builder
 public class Customer extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // O GenerationType.AUTO, SEQUENCE, TABLE
-    private Long id;
 
     @NotBlank(message = "El nombre del cliente es obligatorio")
     @Column(nullable = false)
@@ -61,8 +58,6 @@ public class Customer extends BaseEntity {
     @Column(name = "country")
     private String country;
 
-    @Column(name = "version")
-    private Long version;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
