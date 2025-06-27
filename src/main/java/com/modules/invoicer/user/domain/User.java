@@ -93,7 +93,8 @@ public class User extends BaseEntity implements UserDetails {
 
 
     public String getFullName() {
-        return (firstName != null ? firstName : "") +
-                (lastName != null ? " " + lastName : "").trim();
+        String first = firstName != null ? firstName.trim() : "";
+        String last = lastName != null ? lastName.trim() : "";
+        return (first + " " + last).trim();
     }
 }
