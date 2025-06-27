@@ -99,4 +99,20 @@ class InvoiceServiceTest {
         assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.SENT_VERIFACTU);
         verify(verifactuService).sendInvoiceToVerifactu(invoice);
     }
+
+    @Test
+    void updateInvoiceStatusPersistsChange() {
+        User user = new User();
+        Invoice invoice = new Invoice();
+        invoice.setId(2L);
+        invoice.setStatus(com.modules.invoicer.invoice.domain.InvoiceStatus.DRAFT);
+
+        when(invoiceRepository.findByIdAndUser(2L, user)).thenReturn(java.util.Optional.of(invoice));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Invoice result = invoiceService.updateInvoiceStatus(2L, com.modules.invoicer.invoice.domain.InvoiceStatus.PAID, user);
+
+        assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.PAID);
+        verify(invoiceRepository).save(invoice);
+    }
 }

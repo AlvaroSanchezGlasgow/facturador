@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Detalle de Factura</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    .stepper { display: flex; justify-content: space-between; }
+    .step { text-align: center; flex: 1; position: relative; }
+    .step:not(:last-child)::after {
+      content: ''; position: absolute; top: 12px; right: -50%; width: 100%; height: 2px;
+      background: #dbdbdb; z-index: -1;
+    }
+    .step:first-child::after { left: 50%; }
+    .step:last-child::after { display: none; }
+    .circle {
+      width: 24px; height: 24px; border-radius: 50%; background: #dbdbdb; margin: 0 auto;
+    }
+    .is-active .circle { background: #00d1b2; color: #fff; }
+    .label { font-size: 0.75rem; margin-top: 0.25rem; }
+  </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -16,6 +31,16 @@
     <p><strong>Fecha:</strong> <span th:text="${#temporals.format(invoice.invoiceDate, 'dd-MM-yyyy')}"></span></p>
     <p><strong>Vencimiento:</strong> <span th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}"></span></p>
     <p><strong>Total:</strong> <span th:text="${#numbers.formatDecimal(invoice.totalAmount,0,'POINT',2,'COMMA')} + ' €'"></span></p>
+    <div class="stepper mt-4">
+      <div th:each="status : ${T(com.modules.invoicer.invoice.domain.InvoiceStatus).values()}" class="step" th:classappend="${invoice.status} == ${status} ? 'is-active' : ''">
+        <div class="circle"></div>
+        <div class="label" th:text="${status.displayName}"></div>
+        <form th:action="@{/invoices/{id}/status(id=${invoice.id})}" method="post" th:if="${invoice.status} != ${status}">
+          <input type="hidden" name="status" th:value="${status.name()}"/>
+          <button type="submit" class="button is-small mt-1">Cambiar</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <h3 class="title is-5">Notas internas</h3>
