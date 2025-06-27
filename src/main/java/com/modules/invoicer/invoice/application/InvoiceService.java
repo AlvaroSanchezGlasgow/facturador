@@ -35,9 +35,17 @@ public class InvoiceService {
     public Invoice createInvoice(Invoice invoice, User user) {
         logger.info("Creating invoice for user: {}", user.getUsername());
         invoice.setUser(user);
-        invoice.getCustomer().setUser(user); // Asegura que el cliente también esté asociado al usuario
-        Customer savedCustomer = customerRepository.save(invoice.getCustomer());
-        invoice.setCustomer(savedCustomer);
+
+        Customer customer = invoice.getCustomer();
+        Customer persistentCustomer;
+        if (customer.getId() != null) {
+            persistentCustomer = customerRepository.findByIdAndUser(customer.getId(), user)
+                    .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado o no pertenece al usuario."));
+        } else {
+            customer.setUser(user);
+            persistentCustomer = customerRepository.save(customer);
+        }
+        invoice.setCustomer(persistentCustomer);
 
         // Remove items without required information before persisting
         invoice.getItems().removeIf(InvoiceItem::isEmpty);
