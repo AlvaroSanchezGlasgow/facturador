@@ -267,4 +267,21 @@ public class InvoiceService {
         }
         return invoiceRepository.save(invoice);
     }
+
+    /**
+     * Update the status of an existing invoice.
+     *
+     * @param id     the invoice id
+     * @param status the new status
+     * @param user   the authenticated user
+     * @return the updated invoice
+     */
+    @Transactional
+    public Invoice updateInvoiceStatus(Long id, InvoiceStatus status, User user) {
+        logger.info("Updating status of invoice {} to {} for user {}", id, status, user.getUsername());
+        Invoice invoice = invoiceRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada o no pertenece al usuario."));
+        invoice.setStatus(status);
+        return invoiceRepository.save(invoice);
+    }
 }

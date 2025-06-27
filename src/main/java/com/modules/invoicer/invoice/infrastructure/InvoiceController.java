@@ -7,6 +7,7 @@ import com.modules.invoicer.invoice.domain.Customer;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
 import com.modules.invoicer.invoice.domain.InvoiceNote;
+import com.modules.invoicer.invoice.domain.InvoiceStatus;
 import com.modules.invoicer.user.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,6 +163,21 @@ public class InvoiceController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al enviar la factura: " + e.getMessage());
         }
         return "redirect:/invoices";
+    }
+
+    @PostMapping("/{id}/status")
+    public String updateInvoiceStatus(@PathVariable Long id,
+                                      @RequestParam("status") InvoiceStatus status,
+                                      @AuthenticationPrincipal User currentUser,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            logger.info("Updating status of invoice {} to {}", id, status);
+            invoiceService.updateInvoiceStatus(id, status, currentUser);
+            redirectAttributes.addFlashAttribute("successMessage", "Estado actualizado correctamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el estado: " + e.getMessage());
+        }
+        return "redirect:/invoices/" + id;
     }
 
     @PostMapping("/addItem")
