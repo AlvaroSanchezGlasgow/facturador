@@ -14,10 +14,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @EntityGraph(attributePaths = "customer")
     List<Invoice> findByUser(User user);
 
-    @EntityGraph(attributePaths = "customer")
+    @EntityGraph(attributePaths = {"customer", "items"})
     Optional<Invoice> findByInvoiceNumberAndUser(String invoiceNumber, User user);
 
-    @EntityGraph(attributePaths = "customer")
+    @EntityGraph(attributePaths = {"customer", "items"})
     Optional<Invoice> findByIdAndUser(Long id, User user);
 
     long countByUserAndStatus(User user, InvoiceStatus status);
