@@ -33,4 +33,18 @@ class InvoiceItemTest {
         assertThat(item.getSubtotal()).isEqualByComparingTo("0.00");
         assertThat(item.getTaxAmount()).isEqualByComparingTo("0.00");
     }
+
+    @Test
+    void emptyItemDetectionWorks() {
+        InvoiceItem empty = new InvoiceItem();
+        assertThat(empty.isEmpty()).isTrue();
+
+        InvoiceItem filled = InvoiceItem.builder()
+                .description("Filled")
+                .quantity(new BigDecimal("1"))
+                .unitPrice(new BigDecimal("1"))
+                .build();
+
+        assertThat(filled.isEmpty()).isFalse();
+    }
 }

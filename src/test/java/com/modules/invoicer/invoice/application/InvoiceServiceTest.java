@@ -115,4 +115,17 @@ class InvoiceServiceTest {
         assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.PAID);
         verify(invoiceRepository).save(invoice);
     }
+
+    @Test
+    void asyncWrappersDelegateToSyncMethods() {
+        User user = new User();
+        when(invoiceRepository.findByUser(user)).thenReturn(java.util.List.of());
+        assertThat(invoiceService.findInvoicesByUserAsync(user).join()).isEmpty();
+
+        when(invoiceRepository.findByIdAndUser(3L, user)).thenReturn(java.util.Optional.empty());
+        assertThat(invoiceService.findInvoiceByIdAndUserAsync(3L, user).join()).isEmpty();
+
+        when(invoiceRepository.countByUserAndStatus(user, com.modules.invoicer.invoice.domain.InvoiceStatus.PENDING)).thenReturn(2L);
+        assertThat(invoiceService.countPendingInvoicesAsync(user).join()).isEqualTo(2L);
+    }
 }
