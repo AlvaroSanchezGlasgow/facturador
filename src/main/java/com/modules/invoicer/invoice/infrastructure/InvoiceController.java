@@ -9,6 +9,7 @@ import com.modules.invoicer.invoice.domain.InvoiceItem;
 import com.modules.invoicer.invoice.domain.InvoiceNote;
 import com.modules.invoicer.invoice.domain.InvoiceStatus;
 import com.modules.invoicer.user.domain.User;
+import com.modules.invoicer.user.application.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.validation.Valid;
@@ -34,20 +35,29 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceNoteService invoiceNoteService;
     private final InvoicePdfService pdfService;
+    private final UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceController.class);
 
-    public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService, InvoicePdfService pdfService) {
+    public InvoiceController(InvoiceService invoiceService, InvoiceNoteService invoiceNoteService,
+                             InvoicePdfService pdfService, UserService userService) {
         this.invoiceService = invoiceService;
         this.invoiceNoteService = invoiceNoteService;
         this.pdfService = pdfService;
+        this.userService = userService;
 
+    }
+
+    private User reloadUser(User currentUser) {
+        return userService.findByUsername(currentUser.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @GetMapping
     public String listInvoices(Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Listing invoices for user {}", currentUser.getUsername());
-        List<Invoice> invoices = invoiceService.findInvoicesByUserAsync(currentUser).join();
+        User user = reloadUser(currentUser);
+        List<Invoice> invoices = invoiceService.findInvoicesByUserAsync(user).join();
         model.addAttribute("invoices", invoices);
         return "invoice-list";
     }
@@ -55,24 +65,26 @@ public class InvoiceController {
     @GetMapping("/new")
     public String showCreateInvoiceForm(Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Showing create invoice form for user {}", currentUser.getUsername());
+        User user = reloadUser(currentUser);
         Invoice invoice = new Invoice();
         invoice.setInvoiceDate(LocalDate.now());
         invoice.addItem(new InvoiceItem()); // Añadir un item por defecto
         model.addAttribute("invoice", invoice);
-        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(currentUser).join());
+        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(user).join());
         return "invoice-form";
     }
 
     @PostMapping("/new")
     public String createInvoice(@Valid @ModelAttribute("invoice") Invoice invoice, BindingResult result,
                                 @AuthenticationPrincipal User currentUser, Model model, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         if (result.hasErrors()) {
-            model.addAttribute("customers", invoiceService.findCustomersByUser(currentUser));
+            model.addAttribute("customers", invoiceService.findCustomersByUser(user));
             return "invoice-form";
         }
 
-        logger.info("Creating invoice for user {}", currentUser.getUsername());
-        invoiceService.createInvoiceAsync(invoice, currentUser).join();
+        logger.info("Creating invoice for user {}", user.getUsername());
+        invoiceService.createInvoiceAsync(invoice, user).join();
         redirectAttributes.addFlashAttribute("successMessage", "Factura creada exitosamente!");
         return "redirect:/invoices";
 
@@ -81,7 +93,8 @@ public class InvoiceController {
     @GetMapping("/{id}")
     public String viewInvoice(@PathVariable Long id, Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Viewing invoice {}", id);
-        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, currentUser).join();
+        User user = reloadUser(currentUser);
+        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, user).join();
         if (invoiceOptional.isEmpty()) {
             return "redirect:/invoices";
         }
@@ -102,7 +115,8 @@ public class InvoiceController {
             redirectAttributes.addFlashAttribute("errorMessage", "Contenido de nota inválido");
             return "redirect:/invoices/" + id;
         }
-        invoiceNoteService.addNote(id, newNote.getContent(), currentUser);
+        User user = reloadUser(currentUser);
+        invoiceNoteService.addNote(id, newNote.getContent(), user);
         redirectAttributes.addFlashAttribute("successMessage", "Nota añadida correctamente");
         return "redirect:/invoices/" + id;
     }
@@ -110,40 +124,43 @@ public class InvoiceController {
     @GetMapping("/{id}/edit")
     public String showEditInvoiceForm(@PathVariable Long id, Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Showing edit form for invoice {}", id);
-        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, currentUser).join();
+        User user = reloadUser(currentUser);
+        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, user).join();
         if (invoiceOptional.isEmpty()) {
             return "redirect:/invoices";
         }
         model.addAttribute("invoice", invoiceOptional.get());
-        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(currentUser).join());
+        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(user).join());
         return "invoice-form";
     }
 
     @PostMapping("/{id}/edit")
     public String updateInvoice(@PathVariable Long id, @Valid @ModelAttribute("invoice") Invoice invoice, BindingResult result,
                                 @AuthenticationPrincipal User currentUser, Model model, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         if (result.hasErrors()) {
-            model.addAttribute("customers", invoiceService.findCustomersByUser(currentUser));
+            model.addAttribute("customers", invoiceService.findCustomersByUser(user));
             return "invoice-form";
         }
         try {
             invoice.setId(id); // Asegurar que el ID se mantenga
             logger.info("Updating invoice {}", id);
-            invoiceService.updateInvoiceAsync(invoice, currentUser).join();
+            invoiceService.updateInvoiceAsync(invoice, user).join();
             redirectAttributes.addFlashAttribute("successMessage", "Factura actualizada exitosamente!");
             return "redirect:/invoices";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Error al actualizar la factura: " + e.getMessage());
-            model.addAttribute("customers", invoiceService.findCustomersByUser(currentUser));
+            model.addAttribute("customers", invoiceService.findCustomersByUser(user));
             return "invoice-form";
         }
     }
 
     @PostMapping("/{id}/delete")
     public String deleteInvoice(@PathVariable Long id, @AuthenticationPrincipal User currentUser, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         try {
             logger.info("Deleting invoice {}", id);
-            invoiceService.deleteInvoiceAsync(id, currentUser).join();
+            invoiceService.deleteInvoiceAsync(id, user).join();
             redirectAttributes.addFlashAttribute("successMessage", "Factura eliminada exitosamente!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al eliminar la factura: " + e.getMessage());
@@ -155,9 +172,10 @@ public class InvoiceController {
     public String sendInvoiceToVerifactu(@PathVariable Long id,
                                          @AuthenticationPrincipal User currentUser,
                                          RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         try {
             logger.info("Sending invoice {} to Verifactu", id);
-            invoiceService.sendInvoiceToVerifactu(id, currentUser);
+            invoiceService.sendInvoiceToVerifactu(id, user);
             redirectAttributes.addFlashAttribute("successMessage", "Factura enviada a Verifactu");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al enviar la factura: " + e.getMessage());
@@ -170,9 +188,10 @@ public class InvoiceController {
                                       @RequestParam("status") InvoiceStatus status,
                                       @AuthenticationPrincipal User currentUser,
                                       RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         try {
             logger.info("Updating status of invoice {} to {}", id, status);
-            invoiceService.updateInvoiceStatus(id, status, currentUser);
+            invoiceService.updateInvoiceStatus(id, status, user);
             redirectAttributes.addFlashAttribute("successMessage", "Estado actualizado correctamente");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el estado: " + e.getMessage());
@@ -216,7 +235,8 @@ public class InvoiceController {
     @GetMapping("/customers")
     public String listCustomers(Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Listing customers for invoice module");
-        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(currentUser).join());
+        User user = reloadUser(currentUser);
+        model.addAttribute("customers", invoiceService.findCustomersByUserAsync(user).join());
         return "customers/list";
     }
 
@@ -230,12 +250,13 @@ public class InvoiceController {
     @PostMapping("/customers/new")
     public String createCustomer(@Valid @ModelAttribute("customer") Customer customer, BindingResult result,
                                  @AuthenticationPrincipal User currentUser, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         if (result.hasErrors()) {
             return "customers/form";
         }
         try {
             logger.info("Creating customer {} from invoice module", customer.getNif());
-            invoiceService.createOrUpdateCustomerAsync(customer, currentUser).join();
+            invoiceService.createOrUpdateCustomerAsync(customer, user).join();
             redirectAttributes.addFlashAttribute("successMessage", "Cliente creado exitosamente!");
             return "redirect:/invoices/customers";
         } catch (Exception e) {
@@ -247,7 +268,8 @@ public class InvoiceController {
     @GetMapping("/customers/{id}/edit")
     public String showEditCustomerForm(@PathVariable Long id, Model model, @AuthenticationPrincipal User currentUser) {
         logger.info("Showing edit customer form for id {}", id);
-        Optional<Customer> customerOptional = invoiceService.findCustomerByIdAndUserAsync(id, currentUser).join();
+        User user = reloadUser(currentUser);
+        Optional<Customer> customerOptional = invoiceService.findCustomerByIdAndUserAsync(id, user).join();
         if (customerOptional.isEmpty()) {
             return "redirect:/invoices/customers";
         }
@@ -258,13 +280,14 @@ public class InvoiceController {
     @PostMapping("/customers/{id}/edit")
     public String updateCustomer(@PathVariable Long id, @Valid @ModelAttribute("customer") Customer customer, BindingResult result,
                                  @AuthenticationPrincipal User currentUser, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         if (result.hasErrors()) {
             return "customers/form";
         }
         try {
             customer.setId(id);
             logger.info("Updating customer {}", id);
-            invoiceService.createOrUpdateCustomerAsync(customer, currentUser).join();
+            invoiceService.createOrUpdateCustomerAsync(customer, user).join();
             redirectAttributes.addFlashAttribute("successMessage", "Cliente actualizado exitosamente!");
             return "redirect:/invoices/customers";
         } catch (Exception e) {
@@ -275,9 +298,10 @@ public class InvoiceController {
 
     @PostMapping("/customers/{id}/delete")
     public String deleteCustomer(@PathVariable Long id, @AuthenticationPrincipal User currentUser, RedirectAttributes redirectAttributes) {
+        User user = reloadUser(currentUser);
         try {
             logger.info("Deleting customer {}", id);
-            invoiceService.deleteCustomerAsync(id, currentUser).join();
+            invoiceService.deleteCustomerAsync(id, user).join();
             redirectAttributes.addFlashAttribute("successMessage", "Cliente eliminado exitosamente!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al eliminar el cliente: " + e.getMessage());
