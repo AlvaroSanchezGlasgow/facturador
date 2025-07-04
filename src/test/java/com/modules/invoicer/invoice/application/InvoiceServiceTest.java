@@ -5,6 +5,8 @@ import com.modules.invoicer.invoice.domain.CustomerRepository;
 import com.modules.invoicer.invoice.domain.Invoice;
 import com.modules.invoicer.invoice.domain.InvoiceItem;
 import com.modules.invoicer.invoice.domain.InvoiceRepository;
+import com.modules.invoicer.invoice.domain.InvoiceStatusHistoryRepository;
+import com.modules.invoicer.invoice.domain.InvoiceStatusHistory;
 import com.modules.invoicer.invoice.application.VerifactuService;
 import com.modules.invoicer.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
 
 @ExtendWith(MockitoExtension.class)
 class InvoiceServiceTest {
@@ -30,6 +33,8 @@ class InvoiceServiceTest {
     private CustomerRepository customerRepository;
     @Mock
     private VerifactuService verifactuService;
+    @Mock
+    private InvoiceStatusHistoryRepository statusHistoryRepository;
     @InjectMocks
     private InvoiceService invoiceService;
 
@@ -57,6 +62,7 @@ class InvoiceServiceTest {
         assertThat(result.getSubtotal()).isEqualByComparingTo("10.00");
         verify(customerRepository).save(customer);
         verify(invoiceRepository).save(invoice);
+        verify(statusHistoryRepository).save(any(InvoiceStatusHistory.class));
     }
 
     @Test
@@ -81,6 +87,7 @@ class InvoiceServiceTest {
 
         assertThat(result.getItems()).hasSize(1);
         assertThat(result.getSubtotal()).isEqualByComparingTo("10.00");
+        verify(statusHistoryRepository).save(any(InvoiceStatusHistory.class));
     }
 
     @Test
@@ -98,6 +105,7 @@ class InvoiceServiceTest {
         assertThat(result.isVerifactuSent()).isTrue();
         assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.SENT_VERIFACTU);
         verify(verifactuService).sendInvoiceToVerifactu(invoice);
+        verify(statusHistoryRepository, org.mockito.Mockito.atLeastOnce()).save(any(InvoiceStatusHistory.class));
     }
 
     @Test
@@ -114,6 +122,17 @@ class InvoiceServiceTest {
 
         assertThat(result.getStatus()).isEqualTo(com.modules.invoicer.invoice.domain.InvoiceStatus.PAID);
         verify(invoiceRepository).save(invoice);
+        verify(statusHistoryRepository).save(any(InvoiceStatusHistory.class));
+    }
+
+    @Test
+    void getInvoiceStatusHistoryDelegatesToRepository() {
+        User user = new User();
+        Invoice invoice = new Invoice();
+        java.util.List<InvoiceStatusHistory> history = java.util.List.of(new InvoiceStatusHistory());
+        when(invoiceRepository.findByIdAndUser(5L, user)).thenReturn(java.util.Optional.of(invoice));
+        when(statusHistoryRepository.findByInvoiceOrderByCreatedAtAsc(invoice)).thenReturn(history);
+        assertThat(invoiceService.getInvoiceStatusHistory(5L, user)).isEqualTo(history);
     }
 
     @Test
@@ -127,5 +146,11 @@ class InvoiceServiceTest {
 
         when(invoiceRepository.countByUserAndStatus(user, com.modules.invoicer.invoice.domain.InvoiceStatus.PENDING)).thenReturn(2L);
         assertThat(invoiceService.countPendingInvoicesAsync(user).join()).isEqualTo(2L);
+
+        Invoice invoice = new Invoice();
+        java.util.List<InvoiceStatusHistory> history = java.util.List.of();
+        when(invoiceRepository.findByIdAndUser(4L, user)).thenReturn(java.util.Optional.of(invoice));
+        when(statusHistoryRepository.findByInvoiceOrderByCreatedAtAsc(invoice)).thenReturn(history);
+        assertThat(invoiceService.getInvoiceStatusHistoryAsync(4L, user).join()).isEqualTo(history);
     }
 }

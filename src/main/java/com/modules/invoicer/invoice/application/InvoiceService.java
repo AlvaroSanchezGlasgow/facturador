@@ -1,6 +1,7 @@
 package com.modules.invoicer.invoice.application;
 
 import com.modules.invoicer.invoice.domain.*;
+import com.modules.invoicer.invoice.domain.InvoiceStatusHistoryRepository;
 import com.modules.invoicer.user.domain.User;
 import com.modules.invoicer.invoice.application.VerifactuService;
 import org.slf4j.Logger;
@@ -21,14 +22,17 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final CustomerRepository customerRepository;
     private final VerifactuService verifactuService;
+    private final InvoiceStatusHistoryRepository statusHistoryRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(InvoiceService.class);
 
     public InvoiceService(InvoiceRepository invoiceRepository, CustomerRepository customerRepository,
-                          VerifactuService verifactuService) {
+                          VerifactuService verifactuService,
+                          InvoiceStatusHistoryRepository statusHistoryRepository) {
         this.invoiceRepository = invoiceRepository;
         this.customerRepository = customerRepository;
         this.verifactuService = verifactuService;
+        this.statusHistoryRepository = statusHistoryRepository;
     }
 
     @Transactional
@@ -59,6 +63,7 @@ public class InvoiceService {
 
         invoice.calculateTotals();
         Invoice saved = invoiceRepository.save(invoice);
+        recordStatusChange(saved, saved.getStatus(), user);
         logger.info("Invoice {} created", saved.getId());
         return saved;
     }
@@ -260,10 +265,12 @@ public class InvoiceService {
 
         invoice.setStatus(InvoiceStatus.PENDING_VERIFACTU);
         invoiceRepository.save(invoice);
+        recordStatusChange(invoice, InvoiceStatus.PENDING_VERIFACTU, user);
 
         boolean sent = verifactuService.sendInvoiceToVerifactu(invoice);
         if (sent) {
             invoice.setStatus(InvoiceStatus.SENT_VERIFACTU);
+            recordStatusChange(invoice, InvoiceStatus.SENT_VERIFACTU, user);
         }
         return invoiceRepository.save(invoice);
     }
@@ -282,6 +289,27 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada o no pertenece al usuario."));
         invoice.setStatus(status);
+        recordStatusChange(invoice, status, user);
         return invoiceRepository.save(invoice);
+    }
+
+    public java.util.List<InvoiceStatusHistory> getInvoiceStatusHistory(Long id, User user) {
+        Invoice invoice = invoiceRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada o no pertenece al usuario."));
+        return statusHistoryRepository.findByInvoiceOrderByCreatedAtAsc(invoice);
+    }
+
+    @Async
+    public CompletableFuture<java.util.List<InvoiceStatusHistory>> getInvoiceStatusHistoryAsync(Long id, User user) {
+        return CompletableFuture.completedFuture(getInvoiceStatusHistory(id, user));
+    }
+
+    private void recordStatusChange(Invoice invoice, InvoiceStatus status, User user) {
+        InvoiceStatusHistory history = InvoiceStatusHistory.builder()
+                .invoice(invoice)
+                .status(status)
+                .changedBy(user)
+                .build();
+        statusHistoryRepository.save(history);
     }
 }
