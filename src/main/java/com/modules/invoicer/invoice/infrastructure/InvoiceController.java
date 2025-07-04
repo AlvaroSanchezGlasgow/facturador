@@ -219,7 +219,8 @@ public class InvoiceController {
     public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable Long id,
                                                      @AuthenticationPrincipal User currentUser) {
         logger.info("Downloading PDF for invoice {}", id);
-        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, currentUser).join();
+        User user = reloadUser(currentUser);
+        Optional<Invoice> invoiceOptional = invoiceService.findInvoiceByIdAndUserAsync(id, user).join();
         if (invoiceOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
