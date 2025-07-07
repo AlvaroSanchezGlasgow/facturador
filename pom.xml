@@ -75,6 +75,11 @@
                         <groupId>org.springframework.modulith</groupId>
                         <artifactId>spring-modulith-actuator</artifactId>
                 </dependency>
+                <!-- Spring Boot Actuator for monitoring -->
+                <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-actuator</artifactId>
+                </dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>
