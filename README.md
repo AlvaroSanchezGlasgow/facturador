@@ -22,3 +22,10 @@ If no profile is specified, the application falls back to the `dev` profile.
 
 The database schema is automatically created on startup using Hibernate's
 `ddl-auto=update` setting.
+
+## Actuator endpoints
+
+The application includes [Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html)
+for monitoring and management. By default the base path is `/actuator` and the
+`health` and `info` endpoints are exposed. In the `dev` and `test` profiles all
+endpoints are available.
