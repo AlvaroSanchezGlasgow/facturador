@@ -24,7 +24,7 @@
     <tr th:each="item : ${history}">
       <td th:text="${#temporals.format(item.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
       <td th:text="${item.status.displayName}"></td>
-      <td th:text="${item.changedBy.fullName != '' ? item.changedBy.fullName : item.changedBy.username}"></td>
+      <td th:text="${item.changedBy.displayName}"></td>
     </tr>
     </tbody>
   </table>
