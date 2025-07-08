@@ -41,6 +41,9 @@
         </form>
       </div>
     </div>
+    <div class="mt-3">
+      <a th:href="@{/invoices/{id}/status-history(id=${invoice.id})}" class="button is-small is-link">Ver historial de estados</a>
+    </div>
   </div>
 
   <h3 class="title is-5">Notas internas</h3>
