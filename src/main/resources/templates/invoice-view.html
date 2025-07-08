@@ -49,8 +49,7 @@
   </div>
   <div th:each="note : ${notes}" class="box">
     <p class="is-size-7 has-text-grey"
-       th:text="${#temporals.format(note.createdAt, 'dd-MM-yyyy HH:mm')} + ' - ' +
-                 (note.author.fullName != '' ? note.author.fullName : note.author.username)"></p>
+       th:text="${#temporals.format(note.createdAt, 'dd-MM-yyyy HH:mm')} + ' - ' + note.author.displayName"></p>
     <p th:text="${note.content}"></p>
   </div>
 
