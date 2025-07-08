@@ -97,4 +97,14 @@ public class User extends BaseEntity implements UserDetails {
         String last = lastName != null ? lastName.trim() : "";
         return (first + " " + last).trim();
     }
+
+    /**
+     * Returns the preferred display name for the user. If the user has a
+     * full name configured, it is returned, otherwise the username is used.
+     * This helper avoids complex conditional expressions in the views.
+     */
+    public String getDisplayName() {
+        String fullName = getFullName();
+        return fullName.isEmpty() ? username : fullName;
+    }
 }
