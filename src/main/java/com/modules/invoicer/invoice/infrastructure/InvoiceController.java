@@ -199,6 +199,19 @@ public class InvoiceController {
         return "redirect:/invoices/" + id;
     }
 
+    @GetMapping("/{id}/status-history")
+    public String viewStatusHistory(@PathVariable Long id, Model model,
+                                    @AuthenticationPrincipal User currentUser) {
+        User user = reloadUser(currentUser);
+        Optional<Invoice> invoiceOpt = invoiceService.findInvoiceByIdAndUserAsync(id, user).join();
+        if (invoiceOpt.isEmpty()) {
+            return "redirect:/invoices";
+        }
+        model.addAttribute("invoice", invoiceOpt.get());
+        model.addAttribute("history", invoiceService.getInvoiceStatusHistoryAsync(id, user).join());
+        return "invoice-status-history";
+    }
+
     @PostMapping("/addItem")
     public String addItemToInvoice(@ModelAttribute Invoice invoice) {
         logger.info("Adding item to invoice");
